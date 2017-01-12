@@ -14,10 +14,10 @@ def parse_args():
 
 def load_model(args):
     gpu = args.gpu
-    params = args.params
+    infile = args.infile
 
     model = Inception()
-    serializers.load_hdf5(params, model)
+    serializers.load_hdf5(infile, model)
 
     if gpu >= 0:
         cuda.get_device(gpu).use()
