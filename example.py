@@ -8,7 +8,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=1)
     parser.add_argument('--samples', type=int, default=50000)
-    parser.add_argument('--params', type=str, default='inception_score.model')
+    parser.add_argument('--infile', type=str, default='inception_score.model')
     return parser.parse_args()
 
 
