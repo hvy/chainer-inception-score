@@ -66,5 +66,5 @@ This implementation seems to yield slightly higher scores than the original impl
 
 || This | Original |
 | ------------- | ------------- | ------------- |
-| Mean | 12.43 | 11.24 |
-| Std  | 0.20 | 0.12 |
+| Mean | 11.95 | 11.24 |
+| Std  | 0.11 | 0.12 |
