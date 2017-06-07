@@ -61,7 +61,7 @@ print('Inception score std:', std)
 
 ## Note
 
-This implementation seems to yield slightly higher scores than the original implementation looking at the inception scores for the first 50000 images in CIFAR-10, upsampled to (299, 299) using `scipy.misc.imresize` with bilinear interpolation.
+This implementation seems to yield slightly higher scores than the original implementation looking at the inception scores based on CIFAR-10, upsampled from (32, 32) to (299, 299) using bilinear interpolation.
 
 || Ours | Original |
 | ------------- | ------------- | ------------- |
