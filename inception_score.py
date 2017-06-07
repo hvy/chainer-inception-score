@@ -1,15 +1,12 @@
 import math
-import numpy as np
-import cupy
-from chainer import Chain, Variable, cuda
+
+from chainer import Chain
 from chainer import functions as F
 from chainer import links as L
 
 
 def inception_score(model, ims, batch_size=100, splits=10):
-
-    """Compute the inception score mean and std for the given set of images
-    with the given inception module.
+    """Compute the inception score for given images.
 
     Default batch_size is 100 and split size is 10. Please refer to the
     official implementation. It is recommended to to use at least 50000
@@ -17,14 +14,14 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
     Reference:
     https://github.com/openai/improved-gan/blob/master/inception_score/model.py
-    """
 
+    """
     n, c, w, h = ims.shape
     n_batches = int(math.ceil(float(n) / float(batch_size)))
 
     xp = model.xp
 
-    # Move array to GPU if necessary
+    # Move images to GPU if necessary
     ims = xp.asarray(ims)
 
     print('Batch size:', batch_size)
@@ -56,10 +53,11 @@ def inception_score(model, ims, batch_size=100, splits=10):
     # inception module.
     scores = xp.empty((splits), dtype=xp.float32)  # Split inception scores
     for i in range(splits):
-      part = ys[(i * n // splits):((i + 1) * n // splits), :]
-      kl = part * (xp.log(part) - xp.log(xp.expand_dims(xp.mean(part, 0), 0)))
-      kl = xp.mean(xp.sum(kl, 1))
-      scores[i] = xp.exp(kl)
+        part = ys[(i * n // splits):((i + 1) * n // splits), :]
+        kl = part * (xp.log(part) -
+                     xp.log(xp.expand_dims(xp.mean(part, 0), 0)))
+        kl = xp.mean(xp.sum(kl, 1))
+        scores[i] = xp.exp(kl)
 
     return xp.mean(scores), xp.std(scores)
 
