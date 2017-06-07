@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import scipy.misc
 import cupy
 from chainer import Chain, Variable, cuda
 from chainer import functions as F
@@ -25,6 +24,9 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
     xp = model.xp
 
+    # Move array to GPU if necessary
+    ims = xp.asarray(ims)
+
     print('Batch size:', batch_size)
     print('Total number of images:', n)
     print('Total number of batches:', n_batches)
@@ -43,21 +45,15 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
         # Resize image to the shape expected by the inception module
         if (w, h) != (299, 299):
-            ims_batch_resized = np.empty((ims_batch.shape[0], c, 299, 299))
-            for i, im in enumerate(ims_batch):
-                im = im.transpose((1, 2, 0))
-                im = scipy.misc.imresize(im, (299, 299), interp='bilinear')
-                ims_batch_resized[i] = im.transpose((2, 0, 1))
-            ims_batch = ims_batch_resized
+            ims_batch = F.resize_images(ims_batch, (299, 299))  # bilinear
 
         # Feed images to the inception module to get the softmax predictions
-        ims_batch = xp.asarray(ims_batch, dtype=xp.float32)
-        y = model(Variable(ims_batch, volatile=True), test=True)
+        ims_batch.volatile = True
+        y = model(ims_batch, test=True)
         ys[batch_start:batch_end] = y.data
 
     # Compute the inception score based on the softmax predictions of the
     # inception module.
-
     scores = xp.empty((splits), dtype=xp.float32)  # Split inception scores
     for i in range(splits):
       part = ys[(i * n // splits):((i + 1) * n // splits), :]
@@ -531,72 +527,72 @@ class Inception(Chain):
     def __call__(self, x, test=True):
         """Input dims are (batch_size, 3, 299, 299)."""
 
-        assert x.shape[1:] == (3, 299, 299)
+        # assert x.shape[1:] == (3, 299, 299)
 
         x -= 128.0
         x *= 0.0078125
 
         h = F.relu(self.bn_conv(self.conv(x), test=test))
-        assert h.shape[1:] == (32, 149, 149)
+        # assert h.shape[1:] == (32, 149, 149)
 
         h = F.relu(self.bn_conv_1(self.conv_1(h), test=test))
-        assert h.shape[1:] == (32, 147, 147)
+        # assert h.shape[1:] == (32, 147, 147)
 
         h = F.relu(self.bn_conv_2(self.conv_2(h), test=test))
-        assert h.shape[1:] == (64, 147, 147)
+        # assert h.shape[1:] == (64, 147, 147)
 
         h = F.max_pooling_2d(h, 3, stride=2, pad=0)
-        assert h.shape[1:] == (64, 73, 73)
+        # assert h.shape[1:] == (64, 73, 73)
 
         h = F.relu(self.bn_conv_3(self.conv_3(h), test=test))
-        assert h.shape[1:] == (80, 73, 73)
+        # assert h.shape[1:] == (80, 73, 73)
 
         h = F.relu(self.bn_conv_4(self.conv_4(h), test=test))
-        assert h.shape[1:] == (192, 71, 71)
+        # assert h.shape[1:] == (192, 71, 71)
 
         h = F.max_pooling_2d(h, 3, stride=2, pad=0)
-        assert h.shape[1:] == (192, 35, 35)
+        # assert h.shape[1:] == (192, 35, 35)
 
         h = self.mixed(h, test=test)
-        assert h.shape[1:] == (256, 35, 35)
+        # assert h.shape[1:] == (256, 35, 35)
 
         h = self.mixed_1(h, test=test)
-        assert h.shape[1:] == (288, 35, 35)
+        # assert h.shape[1:] == (288, 35, 35)
 
         h = self.mixed_2(h, test=test)
-        assert h.shape[1:] == (288, 35, 35)
+        # assert h.shape[1:] == (288, 35, 35)
 
         h = self.mixed_3(h, test=test)
-        assert h.shape[1:] == (768, 17, 17)
+        # assert h.shape[1:] == (768, 17, 17)
 
         h = self.mixed_4(h, test=test)
-        assert h.shape[1:] == (768, 17, 17)
+        # assert h.shape[1:] == (768, 17, 17)
 
         h = self.mixed_5(h, test=test)
-        assert h.shape[1:] == (768, 17, 17)
+        # assert h.shape[1:] == (768, 17, 17)
 
         h = self.mixed_6(h, test=test)
-        assert h.shape[1:] == (768, 17, 17)
+        # assert h.shape[1:] == (768, 17, 17)
 
         h = self.mixed_7(h, test=test)
-        assert h.shape[1:] == (768, 17, 17)
+        # assert h.shape[1:] == (768, 17, 17)
 
         h = self.mixed_8(h, test=test)
-        assert h.shape[1:] == (1280, 8, 8)
+        # assert h.shape[1:] == (1280, 8, 8)
 
         h = self.mixed_9(h, test=test)
-        assert h.shape[1:] == (2048, 8, 8)
+        # assert h.shape[1:] == (2048, 8, 8)
 
         h = self.mixed_10(h, test=test)
-        assert h.shape[1:] == (2048, 8, 8)
+        # assert h.shape[1:] == (2048, 8, 8)
 
         h = F.average_pooling_2d(h, 8, 1)
-        assert h.shape[1:] == (2048, 1, 1)
+        # assert h.shape[1:] == (2048, 1, 1)
 
         h = F.reshape(h, (-1, 2048))
         h = self.logit(h)
         h = F.softmax(h)
 
-        assert h.shape[1:] == (1008,)
+        # assert h.shape[1:] == (1008,)
 
         return h
