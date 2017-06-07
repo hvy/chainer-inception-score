@@ -1,43 +1,37 @@
 import argparse
+import numpy as np
+
 from chainer import cuda
-from chainer import serializers, datasets
-from inception_score import Inception, inception_score
+from chainer import datasets
+from chainer import serializers
+from inception_score import Inception
+from inception_score import inception_score
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=1)
-    parser.add_argument('--samples', type=int, default=50000)
-    parser.add_argument('--infile', type=str, default='inception_score.model')
+    parser.add_argument('--samples', type=int, default=-1)
+    parser.add_argument('--model', type=str, default='inception_score.model')
     return parser.parse_args()
 
 
-def load_model(args):
-    gpu = args.gpu
-    infile = args.infile
-
+def main(args):
+    # Load trained model
     model = Inception()
-    serializers.load_hdf5(infile, model)
+    serializers.load_hdf5(args.model, model)
 
-    if gpu >= 0:
-        cuda.get_device(gpu).use()
+    if args.gpu >= 0:
+        cuda.get_device(args.gpu).use()
         model.to_gpu()
 
-    return model
+    # Load images
+    train, test = datasets.get_cifar10(ndim=3, withlabel=False, scale=255.0)
 
-
-def load_ims(args, scale=255.0):
-    samples = args.samples
-
-    ims, _ = datasets.get_cifar10(ndim=3, withlabel=False, scale=scale)
-    ims = ims[:samples]
-
-    return ims
-
-
-def main(args):
-    model = load_model(args)
-    ims = load_ims(args)
+    # Use all 60000 images, unless the number of samples are specified
+    ims = np.concatenate((train, test))
+    if args.samples > 0:
+        ims = ims[:args.samples]
 
     mean, std = inception_score(model, ims)
 
