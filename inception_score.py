@@ -3,6 +3,7 @@ import math
 from chainer import Chain
 from chainer import functions as F
 from chainer import links as L
+from chainer import Variable
 
 
 def inception_score(model, ims, batch_size=100, splits=10):
@@ -39,13 +40,13 @@ def inception_score(model, ims, batch_size=100, splits=10):
         batch_end = min((i + 1) * batch_size, n)
 
         ims_batch = ims[batch_start:batch_end]
+        ims_batch = Variable(ims_batch, volatile=True)
 
         # Resize image to the shape expected by the inception module
         if (w, h) != (299, 299):
             ims_batch = F.resize_images(ims_batch, (299, 299))  # bilinear
 
         # Feed images to the inception module to get the softmax predictions
-        ims_batch.volatile = True
         y = model(ims_batch, test=True)
         ys[batch_start:batch_end] = y.data
 
