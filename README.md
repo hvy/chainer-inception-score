@@ -26,7 +26,7 @@ python download.py --outfile inception_score.model
 Load the pretrained Chainer model and compute the inception score for the CIFAR-10 dataset including both train and test images. To limit the number of images, use the `--samples` option.
 
 ```
-python example.py --infile inception_score.model
+python example.py --model inception_score.model
 ```
 
 ```
