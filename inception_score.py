@@ -22,9 +22,6 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
     xp = model.xp
 
-    # Move images to GPU if necessary
-    ims = xp.asarray(ims)
-
     print('Batch size:', batch_size)
     print('Total number of images:', n)
     print('Total number of batches:', n_batches)
@@ -40,6 +37,7 @@ def inception_score(model, ims, batch_size=100, splits=10):
         batch_end = min((i + 1) * batch_size, n)
 
         ims_batch = ims[batch_start:batch_end]
+        ims_batch = xp.asarray(ims_batch)  # To GPU if using CuPy
         ims_batch = Variable(ims_batch, volatile=True)
 
         # Resize image to the shape expected by the inception module
