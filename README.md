@@ -13,7 +13,7 @@ It is based on the fact that good samples (images that look like images from the
 
 where x is an image, p(y|x) is the inferred class label probabilities given x by the pre-trained Inception network and p(y) is the marginal distribution over all images.
 
-The inception score is defined as exp(E_x[KL(p(y|x) || p(y))])
+The Inception score is defined as exp(E_x[KL(p(y|x) || p(y))])
 
 ## Usage
 
