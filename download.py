@@ -14,13 +14,15 @@ https://github.com/openai/improved-gan
 """
 
 
-MODEL_DIR = './'
 DATA_URL = ('http://download.tensorflow.org/models/image/imagenet/'
             'inception-2015-12-05.tgz')
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--downloads-dir', type=str, default='downloads',
+                        help='Directory in which temporary files are '
+                             'downloaded')
     parser.add_argument('--outfile', type=str, default='inception_score.model')
     return parser.parse_args()
 
@@ -275,13 +277,13 @@ def copy_inception(sess, model):
     model.logit.b.data = b
 
 
-def download_tf_params():
+def download_tf_params(downloads_dir):
     """Download and extract pretrained TensorFlow inception model params."""
 
-    if not os.path.exists(MODEL_DIR):
-        os.makedirs(MODEL_DIR)
+    if not os.path.exists(downloads_dir):
+        os.makedirs(downloads_dir)
     filename = DATA_URL.split('/')[-1]
-    filepath = os.path.join(MODEL_DIR, filename)
+    filepath = os.path.join(downloads_dir, filename)
 
     if not os.path.exists(filepath):
         def _progress(count, block_size, total_size):
@@ -294,14 +296,14 @@ def download_tf_params():
         statinfo = os.stat(filepath)
         print('\nSuccesfully downloaded', filename, statinfo.st_size, 'bytes.')
 
-    tarfile.open(filepath, 'r:gz').extractall(MODEL_DIR)
+    tarfile.open(filepath, 'r:gz').extractall(downloads_dir)
 
 
-def set_tf_params(model, write_graph=False):
+def set_tf_params(model, downloads_dir, write_graph=False):
     """Update the Chainer model parameters from the TensorFlow model."""
 
     with tf.gfile.FastGFile(os.path.join(
-            MODEL_DIR, 'classify_image_graph_def.pb'), 'rb') as f:
+            downloads_dir, 'classify_image_graph_def.pb'), 'rb') as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
         tf.import_graph_def(graph_def, name='')
@@ -319,15 +321,16 @@ def set_tf_params(model, write_graph=False):
 
 def main(args):
     outfile = args.outfile
+    downloads_dir = args.downloads_dir
 
     # Download pretrained TensorFlow model
-    download_tf_params()
+    download_tf_params(downloads_dir)
 
     # Create empty Chainer Inception model
     model = Inception()
 
     # Update parameters of Chainer model with pretrained TensorFlow model
-    set_tf_params(model)
+    set_tf_params(model, downloads_dir)
 
     # TODO(hvy): Test score similarity with the original implementation
 
