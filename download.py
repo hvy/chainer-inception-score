@@ -20,7 +20,7 @@ from chainer import serializers
 from inception_score import Inception
 
 
-MODEL_DIR = '/tmp/imagenet'
+MODEL_DIR = './'
 DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz'
 
 
@@ -181,6 +181,8 @@ def download_tf_params():
 
     """Download and extract pretrained TensorFlow inception model params."""
 
+    print('model dir',MODEL_DIR)
+
     if not os.path.exists(MODEL_DIR):
         os.makedirs(MODEL_DIR)
     filename = DATA_URL.split('/')[-1]
@@ -197,6 +199,8 @@ def download_tf_params():
         print()
         print('Succesfully downloaded', filename, statinfo.st_size, 'bytes.')
 
+
+    print(filepath)
     tarfile.open(filepath, 'r:gz').extractall(MODEL_DIR)
 
 
@@ -227,7 +231,7 @@ def main(args):
     # Download pretrained TensorFlow model
     download_tf_params()
 
-    # Create empty Chainer inception model
+    # Create empty Chainer Inception model
     model = Inception()
 
     # Update parameters of Chainer model with pretrained TensorFlow model

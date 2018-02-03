@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 
+import chainer
 from chainer import cuda
 from chainer import datasets
 from chainer import serializers
@@ -33,7 +34,9 @@ def main(args):
     if args.samples > 0:
         ims = ims[:args.samples]
 
-    mean, std = inception_score(model, ims)
+    with chainer.no_backprop_mode(), \
+            chainer.using_config('train', False):
+        mean, std = inception_score(model, ims)
 
     print('Inception score mean:', mean)
     print('Inception score std:', std)

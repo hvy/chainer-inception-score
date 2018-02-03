@@ -38,14 +38,14 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
         ims_batch = ims[batch_start:batch_end]
         ims_batch = xp.asarray(ims_batch)  # To GPU if using CuPy
-        ims_batch = Variable(ims_batch, volatile=True)
+        ims_batch = Variable(ims_batch)
 
         # Resize image to the shape expected by the inception module
         if (w, h) != (299, 299):
             ims_batch = F.resize_images(ims_batch, (299, 299))  # bilinear
 
         # Feed images to the inception module to get the softmax predictions
-        y = model(ims_batch, test=True)
+        y = model(ims_batch)
         ys[batch_start:batch_end] = y.data
 
     # Compute the inception score based on the softmax predictions of the
@@ -68,10 +68,10 @@ class Mixed(Chain):
             self.add_link(name, link)
         self.trunk = trunk
 
-    def __call__(self, x, test=True):
+    def __call__(self, x):
         hs = []
         for name, _ in self.trunk:
-            h = getattr(self, name)(x, test=test)
+            h = getattr(self, name)(x)
             hs.append(h)
         return F.concat(hs)
 
@@ -84,16 +84,13 @@ class Tower(Chain):
                 self.add_link(name, link)
         self.trunk = trunk
 
-    def __call__(self, x, test=True):
+    def __call__(self, x):
         h = x
         for name, f in self.trunk:
-            if not name.startswith('_'):  # Link
-                if 'bn' in name:
-                    h = getattr(self, name)(h, test=test)
-                else:
-                    h = getattr(self, name)(h)
-            else:  # AveragePooling2D, MaxPooling2D or ReLU
-                h = f(h)
+            if name.startswith('_'):  # AveragePooling2D, MaxPooling2D or ReLU
+                h, = f.apply((h,))
+            else:
+                h = getattr(self, name)(h)  # Link
         return h
 
 
@@ -521,7 +518,7 @@ class Inception(Chain):
             logit=L.Linear(2048, 1008)
         )
 
-    def __call__(self, x, test=True):
+    def __call__(self, x):
         """Input dims are (batch_size, 3, 299, 299)."""
 
         # assert x.shape[1:] == (3, 299, 299)
@@ -529,58 +526,58 @@ class Inception(Chain):
         x -= 128.0
         x *= 0.0078125
 
-        h = F.relu(self.bn_conv(self.conv(x), test=test))
+        h = F.relu(self.bn_conv(self.conv(x)))
         # assert h.shape[1:] == (32, 149, 149)
 
-        h = F.relu(self.bn_conv_1(self.conv_1(h), test=test))
+        h = F.relu(self.bn_conv_1(self.conv_1(h)))
         # assert h.shape[1:] == (32, 147, 147)
 
-        h = F.relu(self.bn_conv_2(self.conv_2(h), test=test))
+        h = F.relu(self.bn_conv_2(self.conv_2(h)))
         # assert h.shape[1:] == (64, 147, 147)
 
         h = F.max_pooling_2d(h, 3, stride=2, pad=0)
         # assert h.shape[1:] == (64, 73, 73)
 
-        h = F.relu(self.bn_conv_3(self.conv_3(h), test=test))
+        h = F.relu(self.bn_conv_3(self.conv_3(h)))
         # assert h.shape[1:] == (80, 73, 73)
 
-        h = F.relu(self.bn_conv_4(self.conv_4(h), test=test))
+        h = F.relu(self.bn_conv_4(self.conv_4(h)))
         # assert h.shape[1:] == (192, 71, 71)
 
         h = F.max_pooling_2d(h, 3, stride=2, pad=0)
         # assert h.shape[1:] == (192, 35, 35)
 
-        h = self.mixed(h, test=test)
+        h = self.mixed(h)
         # assert h.shape[1:] == (256, 35, 35)
 
-        h = self.mixed_1(h, test=test)
+        h = self.mixed_1(h)
         # assert h.shape[1:] == (288, 35, 35)
 
-        h = self.mixed_2(h, test=test)
+        h = self.mixed_2(h)
         # assert h.shape[1:] == (288, 35, 35)
 
-        h = self.mixed_3(h, test=test)
+        h = self.mixed_3(h)
         # assert h.shape[1:] == (768, 17, 17)
 
-        h = self.mixed_4(h, test=test)
+        h = self.mixed_4(h)
         # assert h.shape[1:] == (768, 17, 17)
 
-        h = self.mixed_5(h, test=test)
+        h = self.mixed_5(h)
         # assert h.shape[1:] == (768, 17, 17)
 
-        h = self.mixed_6(h, test=test)
+        h = self.mixed_6(h)
         # assert h.shape[1:] == (768, 17, 17)
 
-        h = self.mixed_7(h, test=test)
+        h = self.mixed_7(h)
         # assert h.shape[1:] == (768, 17, 17)
 
-        h = self.mixed_8(h, test=test)
+        h = self.mixed_8(h)
         # assert h.shape[1:] == (1280, 8, 8)
 
-        h = self.mixed_9(h, test=test)
+        h = self.mixed_9(h)
         # assert h.shape[1:] == (2048, 8, 8)
 
-        h = self.mixed_10(h, test=test)
+        h = self.mixed_10(h)
         # assert h.shape[1:] == (2048, 8, 8)
 
         h = F.average_pooling_2d(h, 8, 1)
