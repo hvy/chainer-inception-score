@@ -11,7 +11,7 @@ from inception_score import inception_score
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', type=int, default=1)
+    parser.add_argument('--gpu', type=int, default=-1)
     parser.add_argument('--samples', type=int, default=-1)
     parser.add_argument('--model', type=str, default='inception_score.model')
     return parser.parse_args()
@@ -34,8 +34,7 @@ def main(args):
     if args.samples > 0:
         ims = ims[:args.samples]
 
-    with chainer.no_backprop_mode(), \
-            chainer.using_config('train', False):
+    with chainer.no_backprop_mode(), chainer.using_config('train', False):
         mean, std = inception_score(model, ims)
 
     print('Inception score mean:', mean)

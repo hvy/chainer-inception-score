@@ -32,7 +32,9 @@ def inception_score(model, ims, batch_size=100, splits=10):
     ys = xp.empty((n, 1008), dtype=xp.float32)  # Softmax container
 
     for i in range(n_batches):
-        print('Running batch', i+1, '/', n_batches, '...')
+
+        print('Running batch', i + 1, '/', n_batches, '...')
+
         batch_start = (i * batch_size)
         batch_end = min((i + 1) * batch_size, n)
 
@@ -234,10 +236,12 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 128, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(128)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(128, 128, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_1', L.Convolution2D(
+                        128, 128, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(128)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(128, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_2', L.Convolution2D(
+                        128, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU())
                 ])),
@@ -245,16 +249,20 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 128, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(128)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(128, 128, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_1', L.Convolution2D(
+                        128, 128, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(128)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(128, 128, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_2', L.Convolution2D(
+                        128, 128, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(128)),
                     ('_relu_2', F.ReLU()),
-                    ('conv_3', L.Convolution2D(128, 128, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_3', L.Convolution2D(
+                        128, 128, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(128)),
                     ('_relu_3', F.ReLU()),
-                    ('conv_4', L.Convolution2D(128, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_4', L.Convolution2D(
+                        128, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
                     ('_relu_4', F.ReLU())
                 ])),
@@ -275,10 +283,12 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(160, 160, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_1', L.Convolution2D(
+                        160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(160)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(160, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_2', L.Convolution2D(
+                        160, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU())
                 ])),
@@ -286,16 +296,20 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(160, 160, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_1', L.Convolution2D(
+                        160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(160)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(160, 160, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_2', L.Convolution2D(
+                        160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(160)),
                     ('_relu_2', F.ReLU()),
-                    ('conv_3', L.Convolution2D(160, 160, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_3', L.Convolution2D(
+                        160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(160)),
                     ('_relu_3', F.ReLU()),
-                    ('conv_4', L.Convolution2D(160, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_4', L.Convolution2D(
+                        160, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
                     ('_relu_4', F.ReLU())
                 ])),
@@ -316,10 +330,12 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(160, 160, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_1', L.Convolution2D(
+                        160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(160)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(160, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_2', L.Convolution2D(
+                        160, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU())
                 ])),
@@ -327,16 +343,20 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(160, 160, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_1', L.Convolution2D(
+                        160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(160)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(160, 160, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_2', L.Convolution2D(
+                        160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(160)),
                     ('_relu_2', F.ReLU()),
-                    ('conv_3', L.Convolution2D(160, 160, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_3', L.Convolution2D(
+                        160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(160)),
                     ('_relu_3', F.ReLU()),
-                    ('conv_4', L.Convolution2D(160, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_4', L.Convolution2D(
+                        160, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
                     ('_relu_4', F.ReLU())
                 ])),
@@ -357,10 +377,12 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(192, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_1', L.Convolution2D(
+                        192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(192)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(192, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_2', L.Convolution2D(
+                        192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU())
                 ])),
@@ -368,16 +390,20 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(192, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_1', L.Convolution2D(
+                        192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(192)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(192, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_2', L.Convolution2D(
+                        192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU()),
-                    ('conv_3', L.Convolution2D(192, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_3', L.Convolution2D(
+                        192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(192)),
                     ('_relu_3', F.ReLU()),
-                    ('conv_4', L.Convolution2D(192, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_4', L.Convolution2D(
+                        192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
                     ('_relu_4', F.ReLU())
                 ])),
@@ -401,10 +427,12 @@ class Inception(Chain):
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU()),
-                    ('conv_1', L.Convolution2D(192, 192, (1, 7), stride=1, pad=(0, 3))),
+                    ('conv_1', L.Convolution2D(
+                        192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(192)),
                     ('_relu_1', F.ReLU()),
-                    ('conv_2', L.Convolution2D(192, 192, (7, 1), stride=1, pad=(3, 0))),
+                    ('conv_2', L.Convolution2D(
+                        192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
                     ('_relu_2', F.ReLU()),
                     ('conv_3', L.Convolution2D(192, 192, 3, stride=2, pad=0)),
@@ -427,12 +455,14 @@ class Inception(Chain):
                     ('_relu', F.ReLU()),
                     ('mixed', Mixed([
                         ('conv', Tower([
-                            ('conv', L.Convolution2D(384, 384, (1, 3), stride=1, pad=(0, 1))),
+                            ('conv', L.Convolution2D(
+                                384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
                             ('_relu', F.ReLU()),
                         ])),
                         ('conv_1', Tower([
-                            ('conv_1', L.Convolution2D(384, 384, (3, 1), stride=1, pad=(1, 0))),
+                            ('conv_1', L.Convolution2D(
+                                384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
                             ('_relu_1', F.ReLU()),
                         ]))
@@ -447,12 +477,14 @@ class Inception(Chain):
                     ('_relu_1', F.ReLU()),
                     ('mixed', Mixed([
                         ('conv', Tower([
-                            ('conv', L.Convolution2D(384, 384, (1, 3), stride=1, pad=(0, 1))),
+                            ('conv', L.Convolution2D(
+                                384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
                             ('_relu', F.ReLU()),
                         ])),
                         ('conv_1', Tower([
-                            ('conv_1', L.Convolution2D(384, 384, (3, 1), stride=1, pad=(1, 0))),
+                            ('conv_1', L.Convolution2D(
+                                384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
                             ('_relu_1', F.ReLU()),
                         ]))
@@ -477,12 +509,14 @@ class Inception(Chain):
                     ('_relu', F.ReLU()),
                     ('mixed', Mixed([
                         ('conv', Tower([
-                            ('conv', L.Convolution2D(384, 384, (1, 3), stride=1, pad=(0, 1))),
+                            ('conv', L.Convolution2D(
+                                384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
                             ('_relu', F.ReLU()),
                         ])),
                         ('conv_1', Tower([
-                            ('conv_1', L.Convolution2D(384, 384, (3, 1), stride=1, pad=(1, 0))),
+                            ('conv_1', L.Convolution2D(
+                                384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
                             ('_relu_1', F.ReLU()),
                         ]))
@@ -497,12 +531,14 @@ class Inception(Chain):
                     ('_relu_1', F.ReLU()),
                     ('mixed', Mixed([
                         ('conv', Tower([
-                            ('conv', L.Convolution2D(384, 384, (1, 3), stride=1, pad=(0, 1))),
+                            ('conv', L.Convolution2D(
+                                384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
                             ('_relu', F.ReLU())
                         ])),
                         ('conv_1', Tower([
-                            ('conv_1', L.Convolution2D(384, 384, (3, 1), stride=1, pad=(1, 0))),
+                            ('conv_1', L.Convolution2D(
+                                384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
                             ('_relu_1', F.ReLU())
                         ]))
