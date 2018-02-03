@@ -84,7 +84,7 @@ def copy_inception(sess, model):
 
     for m in ['mixed', 'mixed_1', 'mixed_2']:
 
-        print('Copying ', m, '...')
+        print('Copying', m, '...')
 
         copy_conv(
             sess, '{}/conv'.format(m), getattr(model, m).conv.conv)
@@ -118,7 +118,7 @@ def copy_inception(sess, model):
 
     for m in ['mixed_3']:
 
-        print('Copying ', m, '...')
+        print('Copying', m, '...')
 
         copy_conv(
             sess, '{}/conv'.format(m), getattr(model, m).conv.conv)
@@ -148,7 +148,7 @@ def copy_inception(sess, model):
 
     for m in ['mixed_4', 'mixed_5', 'mixed_6', 'mixed_7']:
 
-        print('Copying ', m, '...')
+        print('Copying', m, '...')
 
         copy_conv(
             sess, '{}/conv'.format(m), getattr(model, m).conv.conv)
@@ -194,7 +194,7 @@ def copy_inception(sess, model):
 
     for m in ['mixed_8']:
 
-        print('Copying ', m, '...')
+        print('Copying', m, '...')
 
         for t in ['tower', 'tower_1']:
             copy_conv(
@@ -226,7 +226,7 @@ def copy_inception(sess, model):
 
     for m in ['mixed_9', 'mixed_10']:
 
-        print('Copying ', m, '...')
+        print('Copying', m, '...')
 
         copy_conv(
             sess, '{}/conv'.format(m), getattr(model, m).conv.conv)
@@ -334,7 +334,7 @@ def main(args):
 
     # TODO(hvy): Test score similarity with the original implementation
 
-    print('Saving ', outfile, '...')
+    print('Saving', outfile, '...')
     serializers.save_hdf5(outfile, model)
 
 
