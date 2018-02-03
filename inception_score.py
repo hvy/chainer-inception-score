@@ -98,18 +98,20 @@ class Tower(Chain):
 
 class Inception(Chain):
     def __init__(self):
-        super().__init__(
-            conv=L.Convolution2D(3, 32, 3, stride=2, pad=0),
-            conv_1=L.Convolution2D(32, 32, 3, stride=1, pad=0),
-            conv_2=L.Convolution2D(32, 64, 3, stride=1, pad=1),
-            conv_3=L.Convolution2D(64, 80, 1, stride=1, pad=0),
-            conv_4=L.Convolution2D(80, 192, 3, stride=1, pad=0),
-            bn_conv=L.BatchNormalization(32),
-            bn_conv_1=L.BatchNormalization(32),
-            bn_conv_2=L.BatchNormalization(64),
-            bn_conv_3=L.BatchNormalization(80),
-            bn_conv_4=L.BatchNormalization(192),
-            mixed=Mixed([
+        super(Inception, self).__init__()
+
+        with self.init_scope():
+            self.conv = L.Convolution2D(3, 32, 3, stride=2, pad=0)
+            self.conv_1 = L.Convolution2D(32, 32, 3, stride=1, pad=0)
+            self.conv_2 = L.Convolution2D(32, 64, 3, stride=1, pad=1)
+            self.conv_3 = L.Convolution2D(64, 80, 1, stride=1, pad=0)
+            self.conv_4 = L.Convolution2D(80, 192, 3, stride=1, pad=0)
+            self.bn_conv = L.BatchNormalization(32)
+            self.bn_conv_1 = L.BatchNormalization(32)
+            self.bn_conv_2 = L.BatchNormalization(64)
+            self.bn_conv_3 = L.BatchNormalization(80)
+            self.bn_conv_4 = L.BatchNormalization(192)
+            self.mixed = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(192, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
@@ -140,8 +142,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(32)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_1=Mixed([
+            ])
+            self.mixed_1 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(256, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
@@ -172,8 +174,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(64)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_2=Mixed([
+            ])
+            self.mixed_2 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(288, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
@@ -204,8 +206,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(64)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_3=Mixed([
+            ])
+            self.mixed_3 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(288, 384, 3, stride=2, pad=0)),
                     ('bn_conv', L.BatchNormalization(384)),
@@ -225,8 +227,8 @@ class Inception(Chain):
                 ('pool', Tower([
                     ('_pooling', F.MaxPooling2D(3, 2, pad=0))
                 ]))
-            ]),
-            mixed_4=Mixed([
+            ])
+            self.mixed_4 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
@@ -272,8 +274,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_5=Mixed([
+            ])
+            self.mixed_5 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
@@ -319,8 +321,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_6=Mixed([
+            ])
+            self.mixed_6 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
@@ -366,8 +368,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_7=Mixed([
+            ])
+            self.mixed_7 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
@@ -413,8 +415,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_8=Mixed([
+            ])
+            self.mixed_8 = Mixed([
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
@@ -442,8 +444,8 @@ class Inception(Chain):
                 ('pool', Tower([
                     ('_pooling', F.MaxPooling2D(3, 2, pad=0))
                 ]))
-            ]),
-            mixed_9=Mixed([
+            ])
+            self.mixed_9 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(1280, 320, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(320)),
@@ -496,8 +498,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            mixed_10=Mixed([
+            ])
+            self.mixed_10 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(2048, 320, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(320)),
@@ -550,9 +552,8 @@ class Inception(Chain):
                     ('bn_conv', L.BatchNormalization(192)),
                     ('_relu', F.ReLU())
                 ]))
-            ]),
-            logit=L.Linear(2048, 1008)
-        )
+            ])
+            self.logit = L.Linear(2048, 1008)
 
     def __call__(self, x):
         """Input dims are (batch_size, 3, 299, 299)."""
