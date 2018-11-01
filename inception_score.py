@@ -64,6 +64,7 @@ def inception_score(model, ims, batch_size=100, splits=10):
 
 
 class Pooling2D(object):
+
     def __init__(self, ksize, stride, pad):
         self.ksize = ksize
         self.stride = stride
@@ -71,18 +72,21 @@ class Pooling2D(object):
 
 
 class AveragePooling2D(Pooling2D):
+
     def __call__(self, x):
         return F.average_pooling_2d(
             x, ksize=self.ksize, stride=self.stride, pad=self.pad)
 
 
 class MaxPooling2D(Pooling2D):
+
     def __call__(self, x):
         return F.max_pooling_2d(
             x, ksize=self.ksize, stride=self.stride, pad=self.pad)
 
 
 class Mixed(Chain):
+
     def __init__(self, trunk):
         super().__init__()
         for name, link in trunk:
@@ -98,6 +102,7 @@ class Mixed(Chain):
 
 
 class Tower(Chain):
+
     def __init__(self, trunk):
         super().__init__()
         for name, link in trunk:
@@ -116,6 +121,7 @@ class Tower(Chain):
 
 
 class Inception(Chain):
+
     def __init__(self):
         super(Inception, self).__init__()
 
