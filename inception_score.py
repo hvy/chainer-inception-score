@@ -63,6 +63,25 @@ def inception_score(model, ims, batch_size=100, splits=10):
     return xp.mean(scores), xp.std(scores)
 
 
+class Pooling2D(object):
+    def __init__(self, ksize, stride, pad):
+        self.ksize = ksize
+        self.stride = stride
+        self.pad = pad
+
+
+class AveragePooling2D(Pooling2D):
+    def __call__(self, x):
+        return F.average_pooling_2d(
+            x, ksize=self.ksize, stride=self.stride, pad=self.pad)
+
+
+class MaxPooling2D(Pooling2D):
+    def __call__(self, x):
+        return F.max_pooling_2d(
+            x, ksize=self.ksize, stride=self.stride, pad=self.pad)
+
+
 class Mixed(Chain):
     def __init__(self, trunk):
         super().__init__()
@@ -90,7 +109,7 @@ class Tower(Chain):
         h = x
         for name, f in self.trunk:
             if name.startswith('_'):  # AveragePooling2D, MaxPooling2D or ReLU
-                h, = f.apply((h,))
+                h = f(h)
             else:
                 h = getattr(self, name)(h)  # Link
         return h
@@ -115,442 +134,442 @@ class Inception(Chain):
                 ('conv', Tower([
                     ('conv', L.Convolution2D(192, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(192, 48, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(48)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(48, 64, 5, stride=1, pad=2)),
                     ('bn_conv_1', L.BatchNormalization(64)),
-                    ('_relu_1', F.ReLU())
+                    ('_relu_1', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(192, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(64, 96, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(96)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(96, 96, 3, stride=1, pad=1)),
                     ('bn_conv_2', L.BatchNormalization(96)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(192, 32, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(32)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_1 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(256, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(256, 48, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(48)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(48, 64, 5, stride=1, pad=2)),
                     ('bn_conv_1', L.BatchNormalization(64)),
-                    ('_relu_1', F.ReLU())
+                    ('_relu_1', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(256, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(64, 96, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(96)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(96, 96, 3, stride=1, pad=1)),
                     ('bn_conv_2', L.BatchNormalization(96)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(256, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_2 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(288, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(288, 48, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(48)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(48, 64, 5, stride=1, pad=2)),
                     ('bn_conv_1', L.BatchNormalization(64)),
-                    ('_relu_1', F.ReLU())
+                    ('_relu_1', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(288, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(64, 96, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(96)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(96, 96, 3, stride=1, pad=1)),
                     ('bn_conv_2', L.BatchNormalization(96)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(288, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_3 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(288, 384, 3, stride=2, pad=0)),
                     ('bn_conv', L.BatchNormalization(384)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(288, 64, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(64)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(64, 96, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(96)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(96, 96, 3, stride=2, pad=0)),
                     ('bn_conv_2', L.BatchNormalization(96)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('pool', Tower([
-                    ('_pooling', F.MaxPooling2D(3, 2, pad=0))
+                    ('_pooling', MaxPooling2D(3, 2, 0))
                 ]))
             ])
             self.mixed_4 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 128, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(128)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         128, 128, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(128)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         128, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(768, 128, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(128)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         128, 128, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(128)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         128, 128, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(128)),
-                    ('_relu_2', F.ReLU()),
+                    ('_relu_2', F.relu),
                     ('conv_3', L.Convolution2D(
                         128, 128, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(128)),
-                    ('_relu_3', F.ReLU()),
+                    ('_relu_3', F.relu),
                     ('conv_4', L.Convolution2D(
                         128, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
-                    ('_relu_4', F.ReLU())
+                    ('_relu_4', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_5 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(160)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         160, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(160)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(160)),
-                    ('_relu_2', F.ReLU()),
+                    ('_relu_2', F.relu),
                     ('conv_3', L.Convolution2D(
                         160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(160)),
-                    ('_relu_3', F.ReLU()),
+                    ('_relu_3', F.relu),
                     ('conv_4', L.Convolution2D(
                         160, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
-                    ('_relu_4', F.ReLU())
+                    ('_relu_4', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_6 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(160)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         160, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(768, 160, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(160)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(160)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         160, 160, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(160)),
-                    ('_relu_2', F.ReLU()),
+                    ('_relu_2', F.relu),
                     ('conv_3', L.Convolution2D(
                         160, 160, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(160)),
-                    ('_relu_3', F.ReLU()),
+                    ('_relu_3', F.relu),
                     ('conv_4', L.Convolution2D(
                         160, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
-                    ('_relu_4', F.ReLU())
+                    ('_relu_4', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_7 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(192)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU())
+                    ('_relu_2', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_1', L.BatchNormalization(192)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU()),
+                    ('_relu_2', F.relu),
                     ('conv_3', L.Convolution2D(
                         192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_3', L.BatchNormalization(192)),
-                    ('_relu_3', F.ReLU()),
+                    ('_relu_3', F.relu),
                     ('conv_4', L.Convolution2D(
                         192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_4', L.BatchNormalization(192)),
-                    ('_relu_4', F.ReLU())
+                    ('_relu_4', F.relu)
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_8 = Mixed([
                 ('tower', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(192, 320, 3, stride=2, pad=0)),
                     ('bn_conv_1', L.BatchNormalization(320)),
-                    ('_relu_1', F.ReLU())
+                    ('_relu_1', F.relu)
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(768, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(
                         192, 192, (1, 7), stride=1, pad=(0, 3))),
                     ('bn_conv_1', L.BatchNormalization(192)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('conv_2', L.Convolution2D(
                         192, 192, (7, 1), stride=1, pad=(3, 0))),
                     ('bn_conv_2', L.BatchNormalization(192)),
-                    ('_relu_2', F.ReLU()),
+                    ('_relu_2', F.relu),
                     ('conv_3', L.Convolution2D(192, 192, 3, stride=2, pad=0)),
                     ('bn_conv_3', L.BatchNormalization(192)),
-                    ('_relu_3', F.ReLU())
+                    ('_relu_3', F.relu)
                 ])),
                 ('pool', Tower([
-                    ('_pooling', F.MaxPooling2D(3, 2, pad=0))
+                    ('_pooling', MaxPooling2D(3, 2, 0))
                 ]))
             ])
             self.mixed_9 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(1280, 320, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(320)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(1280, 384, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(384)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('mixed', Mixed([
                         ('conv', Tower([
                             ('conv', L.Convolution2D(
                                 384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
-                            ('_relu', F.ReLU()),
+                            ('_relu', F.relu),
                         ])),
                         ('conv_1', Tower([
                             ('conv_1', L.Convolution2D(
                                 384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
-                            ('_relu_1', F.ReLU()),
+                            ('_relu_1', F.relu),
                         ]))
                     ]))
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(1280, 448, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(448)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(448, 384, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(384)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('mixed', Mixed([
                         ('conv', Tower([
                             ('conv', L.Convolution2D(
                                 384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
-                            ('_relu', F.ReLU()),
+                            ('_relu', F.relu),
                         ])),
                         ('conv_1', Tower([
                             ('conv_1', L.Convolution2D(
                                 384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
-                            ('_relu_1', F.ReLU()),
+                            ('_relu_1', F.relu),
                         ]))
                     ]))
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.AveragePooling2D(3, 1, pad=1)),
+                    ('_pooling', AveragePooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(1280, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.mixed_10 = Mixed([
                 ('conv', Tower([
                     ('conv', L.Convolution2D(2048, 320, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(320)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                 ])),
                 ('tower', Tower([
                     ('conv', L.Convolution2D(2048, 384, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(384)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('mixed', Mixed([
                         ('conv', Tower([
                             ('conv', L.Convolution2D(
                                 384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
-                            ('_relu', F.ReLU()),
+                            ('_relu', F.relu),
                         ])),
                         ('conv_1', Tower([
                             ('conv_1', L.Convolution2D(
                                 384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
-                            ('_relu_1', F.ReLU()),
+                            ('_relu_1', F.relu),
                         ]))
                     ]))
                 ])),
                 ('tower_1', Tower([
                     ('conv', L.Convolution2D(2048, 448, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(448)),
-                    ('_relu', F.ReLU()),
+                    ('_relu', F.relu),
                     ('conv_1', L.Convolution2D(448, 384, 3, stride=1, pad=1)),
                     ('bn_conv_1', L.BatchNormalization(384)),
-                    ('_relu_1', F.ReLU()),
+                    ('_relu_1', F.relu),
                     ('mixed', Mixed([
                         ('conv', Tower([
                             ('conv', L.Convolution2D(
                                 384, 384, (1, 3), stride=1, pad=(0, 1))),
                             ('bn_conv', L.BatchNormalization(384)),
-                            ('_relu', F.ReLU())
+                            ('_relu', F.relu)
                         ])),
                         ('conv_1', Tower([
                             ('conv_1', L.Convolution2D(
                                 384, 384, (3, 1), stride=1, pad=(1, 0))),
                             ('bn_conv_1', L.BatchNormalization(384)),
-                            ('_relu_1', F.ReLU())
+                            ('_relu_1', F.relu)
                         ]))
                     ]))
                 ])),
                 ('tower_2', Tower([
-                    ('_pooling', F.MaxPooling2D(3, 1, pad=1)),
+                    ('_pooling', MaxPooling2D(3, 1, 1)),
                     ('conv', L.Convolution2D(2048, 192, 1, stride=1, pad=0)),
                     ('bn_conv', L.BatchNormalization(192)),
-                    ('_relu', F.ReLU())
+                    ('_relu', F.relu)
                 ]))
             ])
             self.logit = L.Linear(2048, 1008)
